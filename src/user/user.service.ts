@@ -22,9 +22,39 @@ export class UserService {
         return user;
     }
 
+    async getUserByEmail(email: string): Promise<User | null>{
+        const user = await this.prismaservice.user.findUnique({
+            where : { email },
+        });
+        if(!user){
+            throw new NotFoundException('user not found');
+        }
+        return user;
+    }
+
+
     async createUser(UserData: CreateUserDto): Promise<User>{
+        const existingUser = await this.getUserByEmail(UserData.email);
+        if(existingUser){
+            throw new NotFoundException(`user with email ${UserData.email} alredy exists`);
+        }
         const user = await this.prismaservice.user.create({
             data: UserData,
+        });
+        return user;
+    }
+
+    async updateUser(id: number, userData: Partial<CreateUserDto>): Promise<User | null>{
+        const user = await this.prismaservice.user.update({
+            where: {id},
+            data: userData,
+        });
+        return user;
+    }
+
+    async deleteUser(id: number): Promise<User | null>{
+        const user = await this.prismaservice.user.delete({
+            where: {id}
         });
         return user;
     }

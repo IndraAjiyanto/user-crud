@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { User } from "@prisma/client";
@@ -22,6 +22,18 @@ export class UserController{
     @Post()
     async createUser(@Body() userData: CreateUserDto): Promise<User>{
         const user = await this.userService.createUser(userData);
+        return user;
+    }
+
+    @Put(':id')
+    async updateUser(@Param('id') id:number, @Body() userData: Partial<CreateUserDto>): Promise<User | null>{
+        const user = await this.userService.updateUser(Number(id), userData);
+        return user;
+    }
+
+    @Delete(':id')
+    async deleteUser(@Param('id')id:number): Promise<User | null>{
+        const user = await this.userService.deleteUser(Number(id));
         return user;
     }
 }
